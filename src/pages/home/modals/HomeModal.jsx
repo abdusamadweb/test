@@ -39,6 +39,11 @@ const HomeModal = ({ modal, setModal, setEffect }) => {
         e.preventDefault()
         setLoading(true)
 
+        setName('')
+        setEmail('')
+        setDate('')
+        setGender('male')
+
         const item = { name, gender, email, date }
         mutation.mutate(item)
     }
