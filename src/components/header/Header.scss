@@ -1,0 +1,31 @@
+@use '/src/scss' as *;
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  padding-block: 1rem;
+  border-right: 1px solid #eee;
+  background: #fff;
+  z-index: 2;
+
+  &__inner {
+    padding-inline: 1rem;
+  }
+
+  .ant-switch, .ant-divider {
+    @include mobile {
+      display: none;
+    }
+  }
+
+  .ant-menu {
+    height: 100%;
+    border-inline-end: none !important;
+
+    &.ant-menu-inline {
+      width: 250px;
+    }
+  }
+}

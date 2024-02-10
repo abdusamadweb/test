@@ -1,0 +1,60 @@
+@use "src/scss" as *;
+
+.home {
+  padding-block: 1rem;
+
+  &__titles {
+    margin-bottom: 2rem;
+
+    .title {
+      margin-block: 0;
+    }
+
+    .fa-plus {
+      margin-left: 10px;
+    }
+  }
+
+  .modal {
+
+    &.del {
+      .form {
+        width: 300px;
+        text-align: center;
+      }
+    }
+
+    .form {
+
+      &__title {
+        display: block;
+        font-weight: 600;
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      &__inp {
+        margin-bottom: 1rem;
+      }
+      &__txt {
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      &__btn {
+        display: block;
+        margin: 0 auto;
+      }
+
+      .ant-radio-group {
+        margin-bottom: 1rem;
+
+        label {
+          width: unset;
+        }
+      }
+    }
+  }
+}
