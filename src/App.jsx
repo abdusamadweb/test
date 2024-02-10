@@ -8,6 +8,7 @@ import Header from "./components/header/Header"
 import Home from "./pages/home/Home"
 import Page404 from "./components/404/Page404.jsx";
 import {Toaster} from "react-hot-toast";
+import Other from "./pages/other/Other.jsx";
 
 
 const App = () => {
@@ -22,7 +23,7 @@ const App = () => {
 
                     <Route path='/' element={<Home />} />
 
-                    <Route path='/' element={<Home />} />
+                    <Route path='/other' element={<Other />} />
 
 
                     {/*404*/}
