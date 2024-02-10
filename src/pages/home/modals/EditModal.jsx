@@ -1,7 +1,15 @@
-import $api from "../../../api/apiConfig.js";
-import toast from "react-hot-toast";
-import {useEffect, useState} from "react";
-import {Button, Input, Radio} from "antd";
+import $api from "../../../api/apiConfig.js"
+import toast from "react-hot-toast"
+import {useEffect, useState} from "react"
+import {Button, Input, Radio} from "antd"
+import {useMutation, useQuery, useQueryClient} from "react-query"
+
+
+const fetchUser = async (userId) => {
+    const { data } = await $api.get(`/users/${userId}`)
+    return data
+}
+
 
 const EditModal = ({ modal, setModal, userId, setEffect }) => {
 
@@ -13,39 +21,53 @@ const EditModal = ({ modal, setModal, userId, setEffect }) => {
     const [email, setEmail] = useState('')
     const [date, setDate] = useState('')
 
+
+    // use mutation
+    const queryClient = useQueryClient()
+
+    const mutation = useMutation(
+        (item) => $api.put(`/users/${userId}`, item),
+        {
+            onSuccess: () => {
+                toast.success('Successfully edited!')
+
+                setLoading(false)
+                setModal(false)
+                setEffect((prev) => !prev)
+
+                queryClient.invalidateQueries(['user', userId])
+            },
+            onError: (err) => {
+                toast.error(err?.response?.data)
+            },
+        }
+    )
+
     const editUser = (e) => {
         e.preventDefault()
         setLoading(true)
 
-        const item = {
-            name, gender, email, date
-        }
-        $api
-            .put(`/users/${userId}`, item)
-            .then(() => {
-                toast.success('Successfully edited!')
-
-                setModal(false)
-                setLoading(false)
-                setEffect(prev => !prev)
-            })
-            .catch(err => {
-                toast.error(err?.response?.data)
-            })
+        const item = { name, gender, email, date }
+        mutation.mutate(item)
     }
 
 
     // get user
+    const { data: user } = useQuery(
+        ['user', userId],
+        () => fetchUser(userId),
+        {
+            enabled: !!userId,
+            refetchOnWindowFocus: false
+        }
+    )
+
     useEffect(() => {
-        $api
-            .get(`/users/${userId}`)
-            .then(res => {
-                setName(res.data.name)
-                setGender(res.data.gender)
-                setEmail(res.data.email)
-                setDate(res.data.date)
-            })
-    }, [userId])
+        setName(user?.name)
+        setGender(user?.gender)
+        setEmail(user?.email)
+        setDate(user?.date)
+    }, [user, userId])
 
 
     return (

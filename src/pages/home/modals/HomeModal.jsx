@@ -2,6 +2,7 @@ import {Button, Input, Radio} from "antd";
 import {useState} from "react";
 import $api from "../../../api/apiConfig.js";
 import toast from "react-hot-toast";
+import {useMutation, useQueryClient} from "react-query";
 
 const HomeModal = ({ modal, setModal, setEffect }) => {
 
@@ -12,29 +13,34 @@ const HomeModal = ({ modal, setModal, setEffect }) => {
     const [email, setEmail] = useState('')
     const [date, setDate] = useState('')
 
-    const createUser = (e) => {
-        e.preventDefault()
-        setLoading(true)
 
-        const item = {
-            name, gender, email, date
-        }
-        $api
-            .post('/users', item)
-            .then(() => {
+    // use mutation
+    const queryClient = useQueryClient()
+
+    const mutation = useMutation(
+        (item) => $api.post('/users', item),
+        {
+            onSuccess: () => {
                 toast.success('Successfully added!')
 
                 setModal(false)
                 setLoading(false)
                 setEffect(prev => !prev)
 
-                setName('')
-                setEmail('')
-                setDate('')
-            })
-            .catch(err => {
+                queryClient.invalidateQueries('users')
+            },
+            onError: (err) => {
                 toast.error(err?.response?.data)
-            })
+            }
+        }
+    )
+
+    const createUser = (e) => {
+        e.preventDefault()
+        setLoading(true)
+
+        const item = { name, gender, email, date }
+        mutation.mutate(item)
     }
 
 

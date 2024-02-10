@@ -1,10 +1,11 @@
 import './Home.scss'
 import $api from "../../api/apiConfig.js"
 import {Button, Space, Table} from "antd"
-import {useEffect, useState} from "react"
+import {useState} from "react"
 import HomeModal from "./modals/HomeModal.jsx"
 import DeleteModal from "./modals/DeleteModal.jsx";
 import EditModal from "./modals/EditModal.jsx";
+import {useQuery} from "react-query";
 
 
 const Home = () => {
@@ -16,8 +17,6 @@ const Home = () => {
 
     const [effect, setEffect] = useState(false)
 
-    const [data, setData] = useState([])
-    const [loading, setLoading] = useState(true)
     const [tableParams, setTableParams] = useState({
         pagination: {
             current: 1,
@@ -25,26 +24,20 @@ const Home = () => {
         },
     })
 
-    useEffect(() => {
-        $api
-            .get('/users')
-            .then(res => {
-                setData(res.data)
 
-                setLoading(false)
-                setTableParams({
-                    ...tableParams,
-                    pagination: {
-                        ...tableParams.pagination,
-                        total: res.data?.length,
-                    },
-                })
-            })
-            .catch(err => {
-                console.error(err)
-                setLoading(false)
-            })
-    }, [JSON.stringify(tableParams), effect])
+    // Fetch data with useQuery
+    const fetchData = async () => {
+        const { data } = await $api.get('/users')
+        return data
+    }
+    const { data, isLoading, refetch } = useQuery(
+        ['users', effect],
+        fetchData,
+        {
+            keepPreviousData: true,
+            refetchOnWindowFocus: false
+        }
+    )
 
     
     // for pagination
@@ -55,10 +48,8 @@ const Home = () => {
             ...sorter,
         })
 
-        if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setData([])
-        }
-    }
+        refetch();
+    };
 
 
     // columns for table
@@ -136,7 +127,7 @@ const Home = () => {
                 columns={columns}
                 dataSource={data}
                 pagination={tableParams.pagination}
-                loading={loading}
+                loading={isLoading}
                 onChange={handleTableChange}
             />
 

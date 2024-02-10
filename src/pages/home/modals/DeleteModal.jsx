@@ -2,27 +2,39 @@ import {Button, Space} from "antd";
 import $api from "../../../api/apiConfig.js";
 import toast from "react-hot-toast";
 import {useState} from "react";
+import {useMutation, useQueryClient} from "react-query";
 
 const DeleteModal = ({ delModal, setDelModal, userId, setEffect }) => {
 
     const [loading, setLoading] = useState(false)
 
-    const deleteUser = (e) => {
-        e.preventDefault()
-        setLoading(true)
 
-        $api
-            .delete(`users/${userId}`)
-            .then(() => {
+    // use mutation
+    const queryClient = useQueryClient()
+
+    const mutation = useMutation(
+        () => $api.delete(`/users/${userId}`),
+        {
+            onSuccess: () => {
                 toast.success('Successfully deleted!')
 
                 setDelModal(false)
                 setLoading(false)
                 setEffect(prev => !prev)
-            })
-            .catch(err => {
+
+                queryClient.invalidateQueries(['user', userId])
+            },
+            onError: (err) => {
                 toast.error(err?.response?.data)
-            })
+            }
+        }
+    )
+
+    const deleteUser = (e) => {
+        e.preventDefault()
+        setLoading(true)
+
+        mutation.mutate()
     }
 
 
